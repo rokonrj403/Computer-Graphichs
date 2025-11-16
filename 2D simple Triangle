@@ -1,0 +1,142 @@
+#include <GL/glut.h>
+#include <iostream>
+#include <cmath>
+
+// Original triangle points
+float x1u, y1u, x2u, y2u, x3u, y3u;
+
+// Transformation parameters
+float tx, ty;        // Translation
+float angleDeg;      // Rotation angle
+float sx, sy;        // Scaling
+float shx, shy;      // Shearing
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // 1) ORIGINAL TRIANGLE (RED)
+    glColor3f(1.0, 0.0, 0.0);
+    glBegin(GL_TRIANGLES);
+        glVertex2f(x1u, y1u);
+        glVertex2f(x2u, y2u);
+        glVertex2f(x3u, y3u);
+    glEnd();
+
+    // 2) TRANSLATED TRIANGLE (BLUE)
+    glColor3f(0.0, 0.0, 1.0);
+    glBegin(GL_TRIANGLES);
+        glVertex2f(x1u + tx, y1u + ty);
+        glVertex2f(x2u + tx, y2u + ty);
+        glVertex2f(x3u + tx, y3u + ty);
+    glEnd();
+
+    // 3) ROTATED TRIANGLE (GREEN) about origin
+    float theta = angleDeg * M_PI / 180.0f;
+    float cosT = std::cos(theta);
+    float sinT = std::sin(theta);
+
+    float x1r = x1u * cosT - y1u * sinT;
+    float y1r = x1u * sinT + y1u * cosT;
+
+    float x2r = x2u * cosT - y2u * sinT;
+    float y2r = x2u * sinT + y2u * cosT;
+
+    float x3r = x3u * cosT - y3u * sinT;
+    float y3r = x3u * sinT + y3u * cosT;
+
+    glColor3f(0.0, 0.7, 0.0);
+    glBegin(GL_TRIANGLES);
+        glVertex2f(x1r, y1r);
+        glVertex2f(x2r, y2r);
+        glVertex2f(x3r, y3r);
+    glEnd();
+
+    // 4) SCALED TRIANGLE (MAGENTA) about origin
+    float x1s = x1u * sx;
+    float y1s = y1u * sy;
+
+    float x2s = x2u * sx;
+    float y2s = y2u * sy;
+
+    float x3s = x3u * sx;
+    float y3s = y3u * sy;
+
+    glColor3f(1.0, 0.0, 1.0);
+    glBegin(GL_TRIANGLES);
+        glVertex2f(x1s, y1s);
+        glVertex2f(x2s, y2s);
+        glVertex2f(x3s, y3s);
+    glEnd();
+
+    // 5) REFLECTED TRIANGLE (CYAN) over X-AXIS (y -> -y)
+    float x1f = x1u, y1f = -y1u;
+    float x2f = x2u, y2f = -y2u;
+    float x3f = x3u, y3f = -y3u;
+
+    glColor3f(0.0, 1.0, 1.0);
+    glBegin(GL_TRIANGLES);
+        glVertex2f(x1f, y1f);
+        glVertex2f(x2f, y2f);
+        glVertex2f(x3f, y3f);
+    glEnd();
+
+    // 6) SHEARED TRIANGLE (YELLOW)
+    // x' = x + shx * y  (X-shear)
+    // y' = y + shy * x  (Y-shear)
+    float x1h = x1u + shx * y1u;
+    float y1h = y1u + shy * x1u;
+
+    float x2h = x2u + shx * y2u;
+    float y2h = y2u + shy * x2u;
+
+    float x3h = x3u + shx * y3u;
+    float y3h = y3u + shy * x3u;
+
+    glColor3f(1.0, 1.0, 0.0);
+    glBegin(GL_TRIANGLES);
+        glVertex2f(x1h, y1h);
+        glVertex2f(x2h, y2h);
+        glVertex2f(x3h, y3h);
+    glEnd();
+
+    glFlush();
+}
+
+void init() {
+    glClearColor(1.0, 1.0, 1.0, 1.0);  // white background
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(-20, 20, -20, 20);      // simple 2D coordinate system
+}
+
+int main(int argc, char** argv) {
+
+    std::cout << "Enter 3 points of the triangle (x y):\n";
+    std::cin >> x1u >> y1u;
+    std::cin >> x2u >> y2u;
+    std::cin >> x3u >> y3u;
+
+    std::cout << "Enter translation Tx Ty: ";
+    std::cin >> tx >> ty;
+
+    std::cout << "Enter rotation angle (degrees): ";
+    std::cin >> angleDeg;
+
+    std::cout << "Enter scaling Sx Sy: ";
+    std::cin >> sx >> sy;
+
+    std::cout << "Enter shearing shx shy: ";
+    std::cin >> shx >> shy;
+
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitWindowSize(700, 700);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow("2D Transformations on Triangle (Simple)");
+
+    init();
+    glutDisplayFunc(display);
+    glutMainLoop();
+
+    return 0;
+}
