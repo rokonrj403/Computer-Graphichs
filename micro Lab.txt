@@ -1,0 +1,251 @@
+.model small
+.stack 100h
+.data
+arr dw 20,30,50,60,80,90,110
+
+.code
+main proc
+    mov ax, @data
+    mov ds, ax
+
+    lea si, arr
+    xor ax, ax
+    mov cx, 7
+
+sum:
+    add ax, [si]
+    add si, 2
+    loop sum
+
+    mov ah, 4ch
+    int 21h
+main endp
+end main
+
+----------
+
+Input and print character:
+
+.model small
+.stack 100h
+.data
+
+.code
+main proc
+    mov ax, @data
+    mov ds, ax
+
+    ; take input character
+    mov ah, 01h
+    int 21h
+    mov bl, al        ; save input character in BL
+
+    ; print new line
+    mov ah, 02h
+    mov dl, 0Dh
+    int 21h
+
+    mov dl, 0Ah
+    int 21h
+
+    ; print the input character
+    mov ah, 02h
+    mov dl, bl
+    int 21h
+
+    ; exit program
+    mov ah, 4Ch
+    int 21h
+
+main endp
+end main
+
+
+--------------
+
+Find Largest:
+
+.MODEL SMALL
+.STACK 100H
+
+.DATA
+    ARRAY DB 2,5,8,6,3
+    LARGEST DB ?
+    MSG DB 'Largest Element: $'
+
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+
+    LEA SI, ARRAY
+    MOV CX, 5
+
+    MOV AL, [SI]
+    MOV LARGEST, AL
+
+    INC SI
+    DEC CX
+
+LOOP_START:
+    MOV AL, [SI]
+    CMP AL, LARGEST
+    JLE SKIP
+
+    MOV LARGEST, AL
+
+SKIP:
+    INC SI
+    LOOP LOOP_START
+
+    ; display message
+    LEA DX, MSG
+    MOV AH, 09H
+    INT 21H
+
+    ; display largest element
+    MOV AL, LARGEST
+    ADD AL, 30H
+    MOV DL, AL
+    MOV AH, 02H
+    INT 21H
+
+    ; exit
+    MOV AH, 4CH
+    INT 21H
+
+MAIN ENDP
+END MAIN
+
+-------------
+
+User Input Largest:
+
+.MODEL SMALL
+.STACK 100H
+
+.DATA
+    ARRAY DB 5 DUP(?)
+    LARGEST DB ?
+    MSG1 DB 'Enter 5 single digit numbers: $'
+    MSG2 DB 0DH,0AH,'Largest Element: $'
+
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+
+    ; show input message
+    LEA DX, MSG1
+    MOV AH, 09H
+    INT 21H
+
+    ; take 5 numbers input
+    LEA SI, ARRAY
+    MOV CX, 5
+
+INPUT_LOOP:
+    MOV AH, 01H
+    INT 21H
+
+    SUB AL, 30H
+    MOV [SI], AL
+
+    INC SI
+    LOOP INPUT_LOOP
+
+    ; find largest number
+    LEA SI, ARRAY
+    MOV CX, 5
+
+    MOV AL, [SI]
+    MOV LARGEST, AL
+
+    INC SI
+    DEC CX
+
+LOOP_START:
+    MOV AL, [SI]
+    CMP AL, LARGEST
+    JLE SKIP
+
+    MOV LARGEST, AL
+
+SKIP:
+    INC SI
+    LOOP LOOP_START
+
+    ; display result message
+    LEA DX, MSG2
+    MOV AH, 09H
+    INT 21H
+
+    ; display largest number
+    MOV AL, LARGEST
+    ADD AL, 30H
+    MOV DL, AL
+    MOV AH, 02H
+    INT 21H
+
+    ; exit
+    MOV AH, 4CH
+    INT 21H
+
+MAIN ENDP
+END MAIN
+
+------------
+
+even odd:
+
+.MODEL SMALL
+.STACK 100H
+
+.DATA
+MSG1 DB 'Enter a number (0-9): $'
+EVENMSG DB 0DH,0AH,'Number is Even$'
+ODDMSG DB 0DH,0AH,'Number is Odd$'
+
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+
+    ; display input message
+    MOV AH, 09H
+    LEA DX, MSG1
+    INT 21H
+
+    ; take input
+    MOV AH, 01H
+    INT 21H
+
+    ; convert ASCII to number
+    SUB AL, 30H
+
+    ; divide number by 2
+    MOV AH, 00H
+    MOV BL, 02H
+    DIV BL
+
+    ; check remainder
+    CMP AH, 00H
+    JE EVEN
+
+ODD:
+    MOV AH, 09H
+    LEA DX, ODDMSG
+    INT 21H
+    JMP ENDD
+
+EVEN:
+    MOV AH, 09H
+    LEA DX, EVENMSG
+    INT 21H
+
+ENDD:
+    MOV AH, 4CH
+    INT 21H
+
+MAIN ENDP
+END MAIN
